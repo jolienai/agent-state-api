@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+#  agent-state-api:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    image: agent-state-api
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - ConnectionStrings__DefaultConnection=Server=postgres;Database=agentstate;User Id=devuser;Password=devpass;
+#      - ASPNETCORE_ENVIRONMENT=Development
+  postgres:
+    image: postgres:15
+    container_name: agent_state_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: agentstate
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
