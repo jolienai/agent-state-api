@@ -9,6 +9,9 @@ public class CallCenterEventCommandValidator : AbstractValidator<CallCenterEvent
     {
         RuleFor(x => x.AgentId)
             .NotEmpty().WithMessage("AgentId is required.");
+        
+        RuleFor(x => x.QueueIds)
+            .NotNull().WithMessage("QueueIds are required.");
 
         RuleFor(x => x.AgentName)
             .NotEmpty().WithMessage("AgentName is required.")
@@ -21,7 +24,8 @@ public class CallCenterEventCommandValidator : AbstractValidator<CallCenterEvent
 
         RuleFor(x => x.QueueIds)
             .NotNull().WithMessage("QueueIds must not be null.")
-            .Must(q => q.Count > 0).WithMessage("QueueIds must contain at least one item.");
+            .Must(q => q.Count > 0).WithMessage("QueueIds must contain at least one item.")
+            .When(x => x.QueueIds is not null);
 
         RuleFor(x => x.TimestampUtc)
             .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Timestamp cannot be in the future.");

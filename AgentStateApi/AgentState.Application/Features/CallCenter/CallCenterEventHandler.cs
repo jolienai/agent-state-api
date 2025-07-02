@@ -7,7 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AgentState.Application.Features.CallCenter;
 
-public class CallCenterEventHandler(IValidator<CallCenterEventCommand> validator, IAgentRepository agentRepository, 
+public class CallCenterEventHandler(
+    IValidator<CallCenterEventCommand> validator, 
+    IAgentRepository agentRepository, 
+    AgentStateBusinessLogic businessLogic,
     ILogger<CallCenterEventHandler> logger) : IRequestHandler<CallCenterEventCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(CallCenterEventCommand request,
@@ -30,13 +33,13 @@ public class CallCenterEventHandler(IValidator<CallCenterEventCommand> validator
                 throw new AgentNotFoundException(request.AgentId);
             
             // 3. Calculate state
-            var newState = DefineAgentState(request);
+            var newState = businessLogic.State(request);
 
             // 4. Setting the agent’s state based on the calculated value
             await agentRepository.UpdateAgentStateAsync(agent, newState, cancellationToken);
             
             // 5.Update the agent’s skills
-            await agentRepository.SyncAgentSkillsAsync(agent, request.QueueIds, cancellationToken);
+            await agentRepository.SyncAgentSkillsAsync(agent, request.QueueIds!, cancellationToken);
 
             await agentRepository.CommitAsync();
                
@@ -48,23 +51,5 @@ public class CallCenterEventHandler(IValidator<CallCenterEventCommand> validator
             await agentRepository.RollbackAsync();
             return Result<bool>.Failure(ex);
         }
-    }
-
-    private static Domain.Enums.AgentStateEnum DefineAgentState(CallCenterEventCommand request)
-    {
-        switch (request.Action)
-        {
-            case Activity.CallStarted:
-                return Domain.Enums.AgentStateEnum.OnCall;
-            case Activity.StartDoNoDisturb:
-            {
-                if (request.TimestampUtc.IsLunchTime())
-                    return Domain.Enums.AgentStateEnum.OnLunch;
-                break;
-            }
-        }
-
-        // this should never happened as it is validating the action to be one of the allowed actions
-        throw new Exception("Not possible do determine the agent state");
     }
 }
