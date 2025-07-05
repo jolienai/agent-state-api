@@ -21,7 +21,7 @@ public class AgentStateBusinessLogic
             }
         }
 
-        // this should never happened as it is validating the action to be one of the allowed actions
+        // this should never have happened as it is validating the action to be one of the allowed actions
         throw new Exception("Not possible do determine the agent state");
     }
 }
