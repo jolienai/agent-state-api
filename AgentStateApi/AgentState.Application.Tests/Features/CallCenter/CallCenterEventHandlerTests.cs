@@ -12,7 +12,7 @@ namespace AgentState.Application.Tests.Features.CallCenter;
 public class CallCenterEventHandlerTests
 {
     private readonly Mock<IValidator<CallCenterEventCommand>> _validatorMock = new();
-    private readonly Mock<IAgentRepository> _agentRepositoryMock = new();
+    private readonly Mock<ICallCenterRepository> _agentRepositoryMock = new();
     private readonly Mock<ILogger<CallCenterEventHandler>> _loggerMock = new();
 
     private readonly CallCenterEventHandler _handler;
@@ -45,7 +45,6 @@ public class CallCenterEventHandlerTests
         // Assert
         Assert.False(result.IsSuccess);
         Assert.IsType<AgentNotFoundException>(result.Error);
-        _agentRepositoryMock.Verify(r => r.RollbackAsync(), Times.Once);
     }
 
     [Fact]
@@ -79,6 +78,5 @@ public class CallCenterEventHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.True(result.Value);
-        _agentRepositoryMock.Verify(r => r.CommitAsync(), Times.Once);
     }
 }

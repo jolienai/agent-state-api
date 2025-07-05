@@ -35,7 +35,7 @@ public static class DependencyInjection
                 npgsql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
             }));
         
-        services.AddScoped<IAgentRepository, AgentRepository>();
+        services.AddScoped<ICallCenterRepository, CallCenterRepository>();
         return services;
     }
 }

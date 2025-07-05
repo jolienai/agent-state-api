@@ -6,17 +6,17 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AgentState.Infrastructure.Repositories;
 
-public class AgentRepository (AppDbContext context) : IAgentRepository
+public class CallCenterRepository(AppDbContext context) : ICallCenterRepository
 {
     private IDbContextTransaction? _transaction;
-    
+
     public async Task<Agent?> GetByIdAsync(string agentId, CancellationToken ct)
     {
         return await context.Agents
             .Include(a => a.Skills)
             .FirstOrDefaultAsync(a => a.Id == agentId, ct);
     }
-    
+
     public Task SyncAgentSkillsAsync(Agent agent, List<string> queueIds, CancellationToken ct)
     {
         var distinctQueueIds = new HashSet<string>(queueIds);
@@ -43,9 +43,7 @@ public class AgentRepository (AppDbContext context) : IAgentRepository
     }
 
     public async Task BeginTransactionAsync(CancellationToken ct)
-    {
-        _transaction = await context.Database.BeginTransactionAsync(ct);
-    }
+        => _transaction = await context.Database.BeginTransactionAsync(ct);
 
     public async Task CommitAsync()
     {
@@ -89,4 +87,8 @@ public class AgentRepository (AppDbContext context) : IAgentRepository
             await DisposeTransactionAsync();
         }
     }
+
+    public async Task SaveChangesAsync(CancellationToken cancellationToken) =>
+        await context.SaveChangesAsync(cancellationToken);
+
 }
