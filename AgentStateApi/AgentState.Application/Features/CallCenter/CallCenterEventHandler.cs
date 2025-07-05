@@ -26,11 +26,9 @@ public class CallCenterEventHandler(
             var agent = await agentRepository.GetByIdAsync(request.AgentId, cancellationToken);
             if (agent is null)
                 throw new AgentNotFoundException(request.AgentId);
-
-            var newState = SetNewState(request.Action, request.TimestampUtc);
-            agent.State = newState.ToString();
-
-            SyncAgentSkills(agent, request.QueueIds!, "system");
+            
+            agent.State = SetNewState(request.Action, request.TimestampUtc);
+            agent.Skills = SyncAgentSkills(agent.Id, agent.Skills, request.QueueIds!, "system");
 
             await agentRepository.SaveChangesAsync(cancellationToken); // single save, atomic
 
@@ -43,19 +41,19 @@ public class CallCenterEventHandler(
         }
     }
     
-    private static Domain.Enums.AgentStateEnum SetNewState(string action, DateTime timestampUtc)
+    private static string SetNewState(string action, DateTime timestampUtc)
     {
         switch (action)
         {
             case Activity.CallStarted:
-                return Domain.Enums.AgentStateEnum.OnCall;
+                return Domain.Enums.AgentStateEnum.OnCall.ToString();
             case Activity.StartDoNoDisturb:
             {
                 if (timestampUtc.IsLunchTime())
-                    return Domain.Enums.AgentStateEnum.OnLunch;
+                    return Domain.Enums.AgentStateEnum.OnLunch.ToString();
 
                 // not sure when not lunchtime what should return
-                return Domain.Enums.AgentStateEnum.OnCall;
+                return Domain.Enums.AgentStateEnum.OnCall.ToString();
             }
         }
 
@@ -63,26 +61,26 @@ public class CallCenterEventHandler(
         throw new Exception("Not possible do determine the agent state");
     }
     
-    private static void SyncAgentSkills(Agent agent, List<string> queueIds, string createdBy)
+    private static List<AgentSkill> SyncAgentSkills(string agentId, List<AgentSkill> skills, List<string> queueIds, string createdBy)
     {
         var distinctQueueIds = new HashSet<string>(queueIds);
-        var existingQueueIds = agent.Skills.Select(s => s.QueueId).ToHashSet();
+        var existingQueueIds = skills.Select(s => s.QueueId).ToHashSet();
 
         // Remove old skills
-        agent.Skills.RemoveAll(s => !distinctQueueIds.Contains(s.QueueId));
+        skills.RemoveAll(s => !distinctQueueIds.Contains(s.QueueId));
 
         // Add new skills
         var newQueueIds = distinctQueueIds.Except(existingQueueIds);
-        foreach (var queueId in newQueueIds)
-        {
-            agent.Skills.Add(new AgentSkill
+
+        return newQueueIds.Select(queueId =>
+            new AgentSkill
             {
                 Id = Guid.NewGuid().ToString(),
-                AgentId = agent.Id,
+                AgentId = agentId,
                 QueueId = queueId,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = createdBy
-            });
-        }
+            }
+        ).ToList();
     }
 }

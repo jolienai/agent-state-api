@@ -102,8 +102,13 @@ public class CallCenterEventHandlerTests
     public async Task HandleAsync_Should_SetStateToOnLunch_WhenActionIsStartDndAndTimeIsLunch()
     {
         // Arrange
-        var lunchTime = DateTime.UtcNow.Date.AddHours(12); // 12:00 PM UTC, assuming it's lunchtime
+        var now = DateTime.UtcNow;
+        var lunchTime = now.Date.AddHours(12);
 
+        // Ensure lunchTime is recent enough to pass the "less than 1 hour old" check
+        if (now > lunchTime.AddHours(1))
+            lunchTime = now.AddMinutes(-30);
+        
         var command = new CallCenterEventCommand
         (
             AgentId: "123",
