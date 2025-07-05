@@ -15,7 +15,7 @@ public class AgentStateBusinessLogicTests
             "agent-1", "Agent Name", DateTime.UtcNow, Activity.CallStarted, new List<string> { "queue1" });
 
         // Act
-        var result = _logic.State(command);
+        var result = AgentStateBusinessLogic.State(command);
 
         // Assert
         Assert.Equal(Domain.Enums.AgentStateEnum.OnCall, result);
@@ -31,7 +31,7 @@ public class AgentStateBusinessLogicTests
             "agent-1", "Agent Name", lunchTime, Activity.StartDoNoDisturb, new List<string> { "queue1" });
 
         // Act
-        var result = _logic.State(command);
+        var result = AgentStateBusinessLogic.State(command);
 
         // Assert
         Assert.Equal(Domain.Enums.AgentStateEnum.OnLunch, result);
@@ -47,7 +47,7 @@ public class AgentStateBusinessLogicTests
             "agent-1", "Agent Name", nonLunchTime, Activity.StartDoNoDisturb, new List<string> { "queue1" });
 
         // Act
-        var result = _logic.State(command);
+        var result = AgentStateBusinessLogic.State(command);
 
         // Assert
         Assert.Equal(Domain.Enums.AgentStateEnum.OnCall, result);
@@ -61,7 +61,7 @@ public class AgentStateBusinessLogicTests
             "agent-1", "Agent Name", DateTime.UtcNow, "UnknownAction", new List<string> { "queue1" });
 
         // Act & Assert
-        var ex = Assert.Throws<Exception>(() => _logic.State(command));
+        var ex = Assert.Throws<Exception>(() => AgentStateBusinessLogic.State(command));
         Assert.Equal("Not possible do determine the agent state", ex.Message);
     }
 }

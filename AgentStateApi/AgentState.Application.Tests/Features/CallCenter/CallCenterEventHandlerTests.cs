@@ -19,9 +19,7 @@ public class CallCenterEventHandlerTests
 
     public CallCenterEventHandlerTests()
     {
-        _handler = new CallCenterEventHandler(_validatorMock.Object, _agentRepositoryMock.Object,
-            new AgentStateBusinessLogic(),
-            _loggerMock.Object);
+        _handler = new CallCenterEventHandler(_validatorMock.Object, _agentRepositoryMock.Object, _loggerMock.Object);
     }
     
     
@@ -69,9 +67,6 @@ public class CallCenterEventHandlerTests
         
         _agentRepositoryMock.Setup(r => r.GetByIdAsync(command.AgentId, default))
             .ReturnsAsync(agent);
-        
-        _agentRepositoryMock.Setup(r => r.UpdateAgentStateAsync(agent, Domain.Enums.AgentStateEnum.OnCall, default))
-            .Returns(Task.CompletedTask);
         
         _agentRepositoryMock.Setup(r => r.SyncAgentSkillsAsync(agent, command.QueueIds!, default))
             .Returns(Task.CompletedTask);

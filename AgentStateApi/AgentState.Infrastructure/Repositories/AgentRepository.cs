@@ -1,6 +1,5 @@
 using AgentState.Application.Repositories;
 using AgentState.Domain.Entities;
-using AgentState.Domain.Enums;
 using AgentState.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -18,29 +17,25 @@ public class AgentRepository (AppDbContext context) : IAgentRepository
             .FirstOrDefaultAsync(a => a.Id == agentId, ct);
     }
     
-    public Task UpdateAgentStateAsync(Agent agent, AgentStateEnum newState, CancellationToken ct)
-    {
-        agent.State = newState.ToString();
-        return Task.CompletedTask;
-    }
-    
     public Task SyncAgentSkillsAsync(Agent agent, List<string> queueIds, CancellationToken ct)
     {
-        var distinctQueueIds = queueIds.Distinct().ToList();
+        var distinctQueueIds = new HashSet<string>(queueIds);
+        var existingQueueIds = agent.Skills.Select(s => s.QueueId).ToHashSet();
 
-        // Remove old skills not in the list
+        // Remove old skills
         agent.Skills.RemoveAll(s => !distinctQueueIds.Contains(s.QueueId));
 
-        // Add new skills not already present
-        foreach (var qid in distinctQueueIds.Where(qid => !agent.Skills.Any(s => s.QueueId == qid)))
+        // Add new skills
+        var newQueueIds = distinctQueueIds.Except(existingQueueIds);
+        foreach (var queueId in newQueueIds)
         {
             agent.Skills.Add(new AgentSkill
             {
                 Id = Guid.NewGuid().ToString(),
                 AgentId = agent.Id,
-                QueueId = qid,
+                QueueId = queueId,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = "system" // replace with authenticated user in the future
+                CreatedBy = "system" // TODO: replace with actual user context
             });
         }
 

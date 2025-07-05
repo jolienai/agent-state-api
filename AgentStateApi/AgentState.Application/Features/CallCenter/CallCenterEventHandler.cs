@@ -1,6 +1,5 @@
 using AgentState.Application.Repositories;
 using AgentState.Application.Shared;
-using AgentState.Domain.Constants;
 using AgentState.Domain.Exceptions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -9,8 +8,7 @@ namespace AgentState.Application.Features.CallCenter;
 
 public class CallCenterEventHandler(
     IValidator<CallCenterEventCommand> validator, 
-    IAgentRepository agentRepository, 
-    AgentStateBusinessLogic businessLogic,
+    IAgentRepository agentRepository,
     ILogger<CallCenterEventHandler> logger) : IRequestHandler<CallCenterEventCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(CallCenterEventCommand request,
@@ -33,10 +31,10 @@ public class CallCenterEventHandler(
                 throw new AgentNotFoundException(request.AgentId);
             
             // 3. Calculate state
-            var newState = businessLogic.State(request);
+            var newState = AgentStateBusinessLogic.State(request);
 
             // 4. Setting the agent’s state based on the calculated value
-            await agentRepository.UpdateAgentStateAsync(agent, newState, cancellationToken);
+            agent.State = newState.ToString(); 
             
             // 5.Update the agent’s skills
             await agentRepository.SyncAgentSkillsAsync(agent, request.QueueIds!, cancellationToken);

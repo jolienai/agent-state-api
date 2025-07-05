@@ -5,7 +5,7 @@ namespace AgentState.Application.Features.CallCenter;
 
 public class AgentStateBusinessLogic
 {
-    public Domain.Enums.AgentStateEnum State(CallCenterEventCommand request)
+    public static Domain.Enums.AgentStateEnum State(CallCenterEventCommand request)
     {
         switch (request.Action)
         {
