@@ -9,7 +9,6 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IValidator<CallCenterEventCommand>, CallCenterEventCommandValidator>();
-        services.AddScoped<AgentStateBusinessLogic>();
         return services;
     }
 }
