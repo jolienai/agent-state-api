@@ -416,3 +416,26 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Ignore Visual Studio test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Ignore NUnit test results
+TestResult.xml
+TestResult-*.xml
+
+# Ignore xUnit reports
+xunit-results.xml
+
+# Ignore code coverage reports (common folders)
+coverage/
+coverage.cobertura.xml
+lcov.info
+
+# Ignore output from tools like ReportGenerator
+coveragereport/
+
+**/.DS_Store
