@@ -436,6 +436,6 @@ coverage.cobertura.xml
 lcov.info
 
 # Ignore output from tools like ReportGenerator
-coveragereport/
+AgentStateApi/coveragereport/
 
 **/.DS_Store

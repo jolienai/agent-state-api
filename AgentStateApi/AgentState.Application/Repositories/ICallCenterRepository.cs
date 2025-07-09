@@ -5,7 +5,6 @@ namespace AgentState.Application.Repositories;
 public interface ICallCenterRepository
 {
     Task<Agent?> GetByIdAsync(string agentId, CancellationToken ct);
-    Task SyncAgentSkillsAsync(Agent agent, List<string> queueIds, CancellationToken ct);
     Task BeginTransactionAsync(CancellationToken ct);
     Task CommitAsync();
     Task RollbackAsync();

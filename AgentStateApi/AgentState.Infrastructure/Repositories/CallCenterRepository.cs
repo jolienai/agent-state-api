@@ -16,32 +16,7 @@ public class CallCenterRepository(AppDbContext context) : ICallCenterRepository
             .Include(a => a.Skills)
             .FirstOrDefaultAsync(a => a.Id == agentId, ct);
     }
-
-    public Task SyncAgentSkillsAsync(Agent agent, List<string> queueIds, CancellationToken ct)
-    {
-        var distinctQueueIds = new HashSet<string>(queueIds);
-        var existingQueueIds = agent.Skills.Select(s => s.QueueId).ToHashSet();
-
-        // Remove old skills
-        agent.Skills.RemoveAll(s => !distinctQueueIds.Contains(s.QueueId));
-
-        // Add new skills
-        var newQueueIds = distinctQueueIds.Except(existingQueueIds);
-        foreach (var queueId in newQueueIds)
-        {
-            agent.Skills.Add(new AgentSkill
-            {
-                Id = Guid.NewGuid().ToString(),
-                AgentId = agent.Id,
-                QueueId = queueId,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = "system" // TODO: replace with actual user context
-            });
-        }
-
-        return Task.CompletedTask;
-    }
-
+    
     public async Task BeginTransactionAsync(CancellationToken ct)
         => _transaction = await context.Database.BeginTransactionAsync(ct);
 
