@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentState.Api", "AgentState.Api\AgentState.Api.csproj", "{67D246ED-1780-4123-8A6B-3F80D04D07AA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{1762CCE2-BD7F-4B52-A8AE-C7B998087446}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{1762CCE2-BD7F-4B52-A8AE-C7B998087446}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{0174A0E5-C87D-416F-BCC9-3106BBD43850}"
 EndProject

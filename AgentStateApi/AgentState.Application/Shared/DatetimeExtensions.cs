@@ -2,9 +2,9 @@ namespace AgentState.Application.Shared;
 
 internal static class DatetimeExtensions
 {
-    public static bool IsLessThanOneHour(this DateTime timestampUtc)
+    public static bool IsLessThanOneHour(this DateTime timestampUtc, ITimeProvider timeProvider)
     {
-        return DateTime.UtcNow - timestampUtc > TimeSpan.FromHours(1);
+        return timeProvider.UtcNow - timestampUtc > TimeSpan.FromHours(1);
     }
 
     public static bool IsLunchTime(this DateTime timestampUtc)

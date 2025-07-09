@@ -1,16 +1,16 @@
 version: '3.9'
 
 services:
-#  agent-state-api:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    image: agent-state-api
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      - ConnectionStrings__DefaultConnection=Server=postgres;Database=agentstate;User Id=devuser;Password=devpass;
-#      - ASPNETCORE_ENVIRONMENT=Development
+  agent-state-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agent-state-api
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=agentstate;User Id=devuser;Password=devpass;
+      - ASPNETCORE_ENVIRONMENT=Development
   postgres:
     image: postgres:15
     container_name: agent_state_postgres

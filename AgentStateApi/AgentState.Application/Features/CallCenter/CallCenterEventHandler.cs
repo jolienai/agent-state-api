@@ -11,6 +11,7 @@ namespace AgentState.Application.Features.CallCenter;
 public class CallCenterEventHandler(
     IValidator<CallCenterEventCommand> validator, 
     ICallCenterRepository agentRepository,
+    ITimeProvider timeProvider,
     ILogger<CallCenterEventHandler> logger) : IRequestHandler<CallCenterEventCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(CallCenterEventCommand request,
@@ -20,7 +21,7 @@ public class CallCenterEventHandler(
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
-            if (request.TimestampUtc.IsLessThanOneHour())
+            if (request.TimestampUtc.IsLessThanOneHour(timeProvider))
                 throw new LateEventException(request.TimestampUtc);
 
             var agent = await agentRepository.GetByIdAsync(request.AgentId, cancellationToken);

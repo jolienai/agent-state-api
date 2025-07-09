@@ -24,23 +24,23 @@ public static class ResultExtensions
 
         return result.Error switch
         {
-            AgentNotFoundException ex => ReturnHttpResult<T>(ex),
-            LateEventException lateEx => ReturnHttpResult<T>(lateEx),
-            ValidationException validationEx => ReturnHttpResult<T>(validationEx),
+            AgentNotFoundException ex => ReturnHttpResult(ex),
+            LateEventException lateEx => ReturnHttpResult(lateEx),
+            ValidationException validationEx => ReturnHttpResult(validationEx),
             _ => Results.Problem(title: "Unexpected error", detail: result.Error?.ToString())
         };
     }
 
-    private static IResult ReturnHttpResult<T>(AgentNotFoundException ex)
+    private static IResult ReturnHttpResult(AgentNotFoundException ex)
     {
         return Results.Problem(
-            title: "Event too late",
+            title: "Agent not found",
             detail: ex.Message,
             statusCode: StatusCodes.Status404NotFound
         );
     }
     
-    private static IResult ReturnHttpResult<T>(LateEventException lateEx)
+    private static IResult ReturnHttpResult(LateEventException lateEx)
     {
         return Results.Problem(
             title: "Event too late",
@@ -49,13 +49,13 @@ public static class ResultExtensions
         );
     }
 
-    private static IResult ReturnHttpResult<T>(ValidationException validationEx)
+    private static IResult ReturnHttpResult(ValidationException validationEx)
     {
         var pd = new ValidationProblemDetails();
 
         foreach (var error in validationEx.Errors)
         {
-            pd.Errors.TryAdd(error.PropertyName, new[] { error.ErrorMessage });
+            pd.Errors.TryAdd(error.PropertyName, [error.ErrorMessage]);
         }
 
         pd.Title = "Validation failed.";

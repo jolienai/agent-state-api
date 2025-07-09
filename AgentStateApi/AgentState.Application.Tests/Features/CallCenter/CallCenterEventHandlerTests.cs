@@ -1,5 +1,6 @@
 using AgentState.Application.Features.CallCenter;
 using AgentState.Application.Repositories;
+using AgentState.Application.Shared;
 using AgentState.Domain.Constants;
 using AgentState.Domain.Entities;
 using AgentState.Domain.Exceptions;
@@ -14,6 +15,7 @@ public class CallCenterEventHandlerTests
     private readonly Mock<IValidator<CallCenterEventCommand>> _validatorMock = new();
     private readonly Mock<ICallCenterRepository> _agentRepositoryMock = new();
     private readonly Mock<ILogger<CallCenterEventHandler>> _loggerMock = new();
+    private readonly Mock<ITimeProvider> _timeProviderMock = new();
 
     private readonly CallCenterEventHandler _handler;
 
@@ -22,6 +24,7 @@ public class CallCenterEventHandlerTests
         _handler = new CallCenterEventHandler(
             _validatorMock.Object,
             _agentRepositoryMock.Object,
+            _timeProviderMock.Object,
             _loggerMock.Object
         );
     }
@@ -98,16 +101,17 @@ public class CallCenterEventHandlerTests
         Assert.Equal(Domain.Enums.AgentStateEnum.OnCall.ToString(), agent.State);
     }
     
-    [Fact]
-    public async Task HandleAsync_Should_SetStateToOnLunch_WhenActionIsStartDndAndTimeIsLunch()
+    [Theory]
+    [InlineData(11)]
+    [InlineData(12)]
+    [InlineData(13)]
+    public async Task HandleAsync_Should_SetStateToOnLunch_WhenActionIsStartDndAndTimeIsLunch(int hour)
     {
         // Arrange
         var now = DateTime.UtcNow;
-        var lunchTime = now.Date.AddHours(12);
+        var lunchTime = now.Date.AddHours(hour);
 
-        // Ensure lunchTime is recent enough to pass the "less than 1 hour old" check
-        if (now > lunchTime.AddHours(1))
-            lunchTime = now.AddMinutes(-30);
+        _timeProviderMock.Setup(x => x.UtcNow).Returns(lunchTime);
         
         var command = new CallCenterEventCommand
         (
